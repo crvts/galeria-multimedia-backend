@@ -1,0 +1,227 @@
+<!DOCTYPE html>
+<html lang="es">
+
+<head>
+<meta charset="UTF-8">
+<title>Gestor Multimedia NoSQL</title>
+
+<script src="https://cdn.tailwindcss.com"></script>
+
+</head>
+
+
+<body class="bg-gray-100 p-8">
+
+
+<div class="max-w-xl mx-auto bg-white p-6 rounded-lg shadow-md">
+
+
+<h2 class="text-2xl font-bold mb-4">
+Subir Elemento a la Base de Datos NoSQL
+</h2>
+
+
+<form 
+id="formulario"
+enctype="multipart/form-data"
+class="space-y-4">
+
+
+<div>
+
+<label class="block font-medium">
+Título del Elemento:
+</label>
+
+<input 
+type="text"
+id="titulo"
+required
+class="w-full border p-2 rounded">
+
+</div>
+
+
+
+<div>
+
+<label class="block font-medium">
+Descripción:
+</label>
+
+<textarea 
+id="descripcion"
+class="w-full border p-2 rounded">
+</textarea>
+
+</div>
+
+
+
+
+<div>
+
+<label class="block font-medium">
+Seleccionar Imagen:
+</label>
+
+
+<input 
+type="file"
+id="imagen"
+accept="image/*"
+required>
+
+
+</div>
+
+
+
+
+<div>
+
+<label class="block font-medium">
+Seleccionar Audio:
+</label>
+
+
+<input 
+type="file"
+id="audio"
+accept=".mp3,.wav,.m4a,audio/*">
+
+
+</div>
+
+
+
+<button 
+type="submit"
+class="bg-blue-600 text-white px-4 py-2 rounded">
+
+Guardar en la Nube
+
+</button>
+
+
+
+</form>
+
+
+
+<p id="mensaje" class="mt-4"></p>
+
+
+</div>
+
+
+
+<script>
+
+
+const API_URL="http://localhost:3000/multimedia";
+
+
+
+document
+.getElementById("formulario")
+.addEventListener("submit", async(e)=>{
+
+
+e.preventDefault();
+
+
+
+const datos = new FormData();
+
+
+
+datos.append(
+"titulo",
+document.getElementById("titulo").value
+);
+
+
+
+datos.append(
+"descripcion",
+document.getElementById("descripcion").value
+);
+
+
+
+datos.append(
+"imagen",
+document.getElementById("imagen").files[0]
+);
+
+
+
+
+const audio = document.getElementById("audio").files[0];
+
+
+if(audio){
+
+datos.append("audio",audio);
+
+}
+
+
+
+
+try{
+
+
+const respuesta = await fetch(API_URL,{
+
+method:"POST",
+
+body:datos
+
+});
+
+
+
+const resultado = await respuesta.json();
+
+
+
+console.log(resultado);
+
+
+
+document.getElementById("mensaje").innerHTML =
+"✅ Archivo guardado correctamente";
+
+
+
+document.getElementById("formulario").reset();
+
+
+
+}catch(error){
+
+
+console.log(error);
+
+
+document.getElementById("mensaje").innerHTML =
+"❌ Error al guardar";
+
+
+}
+
+
+
+});
+
+
+
+</script>
+
+
+
+</body>
+
+</html>
