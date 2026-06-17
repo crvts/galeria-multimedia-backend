@@ -1,11 +1,9 @@
 <!DOCTYPE html>
-
 <html lang="es">
 
 <head>
 
 <meta charset="UTF-8">
-
 <title>Galería Multimedia CRUD</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
@@ -16,60 +14,81 @@
 <body class="bg-pink-100 p-8">
 
 
-<div class="max-w-5xl mx-auto bg-white p-8 rounded-3xl shadow">
+<div class="max-w-4xl mx-auto bg-white p-8 rounded-3xl shadow">
 
 
-<h1 class="text-4xl text-pink-600 font-bold text-center">
-
-🎨 Galería Multimedia
-
+<h1 class="text-4xl font-bold text-pink-600 text-center mb-6">
+🎨 Galería Multimedia CRUD
 </h1>
 
 
 
-<input id="titulo"
-class="border p-3 w-full mt-5"
+<input 
+id="titulo"
+class="w-full border p-3 rounded mb-3"
 placeholder="Título">
 
 
 
-<textarea id="descripcion"
-class="border p-3 w-full mt-3"
-placeholder="Descripción"></textarea>
+<textarea
+id="descripcion"
+class="w-full border p-3 rounded mb-3"
+placeholder="Descripción">
+</textarea>
 
 
 
 
-<input id="imagen"
+<label>
+Imagen:
+</label>
+
+<input 
 type="file"
-class="mt-3">
+id="imagen"
+accept="image/*"
+class="mb-3">
 
 
 
-<input id="audio"
+<br>
+
+
+
+<label>
+Audio:
+</label>
+
+
+<input 
 type="file"
-class="mt-3">
+id="audio"
+accept="audio/*"
+class="mb-3">
 
 
 
+<button 
+onclick="guardar()"
+class="bg-pink-600 text-white p-3 rounded w-full">
 
-
-<button onclick="guardar()"
-class="bg-pink-500 text-white p-3 rounded mt-4 w-full">
-
-Guardar
+Guardar elemento 💾
 
 </button>
 
 
 
-<table class="w-full mt-8">
+
+<hr class="my-8">
 
 
-<tbody id="tabla"></tbody>
+
+<h2 class="text-2xl font-bold">
+Elementos guardados
+</h2>
 
 
-</table>
+<div id="lista"></div>
 
 
 
@@ -82,56 +101,93 @@ Guardar
 <script>
 
 
-const API="https://TU-BACKEND.onrender.com/multimedia";
+const API_URL =
+"https://galeria-multimedia-1.onrender.com/multimedia";
+
+
+
+let editando=null;
+
+
 
 
 
 async function guardar(){
 
 
-const datos=new FormData();
+const datos = new FormData();
 
 
 
 datos.append(
 "titulo",
-titulo.value
+document.getElementById("titulo").value
 );
+
 
 
 datos.append(
 "descripcion",
-descripcion.value
+document.getElementById("descripcion").value
 );
 
 
-if(imagen.files[0])
 
 datos.append(
 "imagen",
-imagen.files[0]
+document.getElementById("imagen").files[0]
 );
 
 
-
-if(audio.files[0])
 
 datos.append(
 "audio",
-audio.files[0]
+document.getElementById("audio").files[0]
 );
 
 
 
 
-await fetch(API,{
 
-method:"POST",
+let url = API_URL;
+
+
+let metodo="POST";
+
+
+
+if(editando){
+
+
+url=`${API_URL}/${editando}`;
+
+metodo="PUT";
+
+
+}
+
+
+
+
+
+await fetch(url,{
+
+method:metodo,
 
 body:datos
 
 });
 
+
+
+alert("Guardado correctamente");
+
+
+
+editando=null;
+
+
+limpiar();
 
 
 mostrar();
@@ -148,69 +204,88 @@ mostrar();
 async function mostrar(){
 
 
-const res =
-await fetch(API);
+const respuesta =
+await fetch(API_URL);
+
 
 
 const datos =
-await res.json();
+await respuesta.json();
 
 
 
-tabla.innerHTML="";
+lista.innerHTML="";
 
 
 
-datos.forEach(m=>{
+datos.forEach(e=>{
 
 
-tabla.innerHTML+=`
+lista.innerHTML += `
 
 
-<tr class="border">
+<div class="border p-4 mt-4 rounded">
 
 
-<td>
-
-${m.titulo}
-
-</td>
+<h3 class="font-bold text-xl">
+${e.titulo}
+</h3>
 
 
-<td>
-
-${m.descripcion}
-
-</td>
+<p>
+${e.descripcion}
+</p>
 
 
+<img 
+src="${e.imagenUrl}"
+width="200">
 
-<td>
+
+
+<audio controls>
+
+<source src="${e.audioUrl}">
+
+</audio>
+
+
+
+<br>
 
 
 <button
 
-onclick="eliminar('${m._id}')"
+onclick="editar('${e._id}',
+'${e.titulo}',
+'${e.descripcion}')"
 
-class="bg-red-500 text-white p-2">
+class="bg-yellow-400 px-3 py-1 rounded">
+
+Editar
+
+</button>
+
+
+
+<button
+
+onclick="eliminar('${e._id}')"
+
+class="bg-red-500 text-white px-3 py-1 rounded">
 
 Eliminar
 
 </button>
 
 
-</td>
-
-
-
-</tr>
+</div>
 
 
 `;
 
 
 });
-
 
 
 }
@@ -221,11 +296,32 @@ Eliminar
 
 
 
+function editar(id,titulo,descripcion){
+
+
+document.getElementById("titulo").value=titulo;
+
+
+document.getElementById("descripcion").value=descripcion;
+
+
+editando=id;
+
+
+}
+
+
+
+
+
+
 
 async function eliminar(id){
 
 
-await fetch(`${API}/${id}`,{
+await fetch(
+`${API_URL}/${id}`,
+{
 
 method:"DELETE"
 
@@ -239,7 +335,29 @@ mostrar();
 
 
 
+
+
+
+
+function limpiar(){
+
+
+titulo.value="";
+
+descripcion.value="";
+
+imagen.value="";
+
+audio.value="";
+
+
+}
+
+
+
+
 mostrar();
+
 
 
 </script>
