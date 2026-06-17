@@ -1,179 +1,130 @@
 <!DOCTYPE html>
+
 <html lang="es">
 
 <head>
+
 <meta charset="UTF-8">
-<title>Gestor Multimedia NoSQL</title>
+
+<title>Galería Multimedia CRUD</title>
 
 <script src="https://cdn.tailwindcss.com"></script>
 
 </head>
 
 
-<body class="bg-gray-100 p-8">
+<body class="bg-pink-100 p-8">
 
 
-<div class="max-w-xl mx-auto bg-white p-6 rounded-lg shadow-md">
+<div class="max-w-5xl mx-auto bg-white p-8 rounded-3xl shadow">
 
 
-<h2 class="text-2xl font-bold mb-4">
-Subir Elemento a la Base de Datos NoSQL
-</h2>
+<h1 class="text-4xl text-pink-600 font-bold text-center">
 
+🎨 Galería Multimedia
 
-<form 
-id="formulario"
-enctype="multipart/form-data"
-class="space-y-4">
-
-
-<div>
-
-<label class="block font-medium">
-Título del Elemento:
-</label>
-
-<input 
-type="text"
-id="titulo"
-required
-class="w-full border p-2 rounded">
-
-</div>
+</h1>
 
 
 
-<div>
+<input id="titulo"
+class="border p-3 w-full mt-5"
+placeholder="Título">
 
-<label class="block font-medium">
-Descripción:
-</label>
 
-<textarea 
-id="descripcion"
-class="w-full border p-2 rounded">
-</textarea>
 
-</div>
+<textarea id="descripcion"
+class="border p-3 w-full mt-3"
+placeholder="Descripción"></textarea>
 
 
 
 
-<div>
-
-<label class="block font-medium">
-Seleccionar Imagen:
-</label>
-
-
-<input 
+<input id="imagen"
 type="file"
-id="imagen"
-accept="image/*"
-required>
-
-
-</div>
+class="mt-3">
 
 
 
-
-<div>
-
-<label class="block font-medium">
-Seleccionar Audio:
-</label>
-
-
-<input 
+<input id="audio"
 type="file"
-id="audio"
-accept=".mp3,.wav,.m4a,audio/*">
-
-
-</div>
+class="mt-3">
 
 
 
-<button 
-type="submit"
-class="bg-blue-600 text-white px-4 py-2 rounded">
 
-Guardar en la Nube
+
+<button onclick="guardar()"
+class="bg-pink-500 text-white p-3 rounded mt-4 w-full">
+
+Guardar
 
 </button>
 
 
 
-</form>
+<table class="w-full mt-8">
 
 
+<tbody id="tabla"></tbody>
 
-<p id="mensaje" class="mt-4"></p>
+
+</table>
+
 
 
 </div>
+
+
 
 
 
 <script>
 
 
-const API_URL="http://localhost:3000/multimedia";
+const API="https://TU-BACKEND.onrender.com/multimedia";
 
 
 
-document
-.getElementById("formulario")
-.addEventListener("submit", async(e)=>{
+async function guardar(){
 
 
-e.preventDefault();
-
-
-
-const datos = new FormData();
+const datos=new FormData();
 
 
 
 datos.append(
 "titulo",
-document.getElementById("titulo").value
+titulo.value
 );
-
 
 
 datos.append(
 "descripcion",
-document.getElementById("descripcion").value
+descripcion.value
 );
 
 
+if(imagen.files[0])
 
 datos.append(
 "imagen",
-document.getElementById("imagen").files[0]
+imagen.files[0]
+);
+
+
+
+if(audio.files[0])
+
+datos.append(
+"audio",
+audio.files[0]
 );
 
 
 
 
-const audio = document.getElementById("audio").files[0];
-
-
-if(audio){
-
-datos.append("audio",audio);
-
-}
-
-
-
-
-try{
-
-
-const respuesta = await fetch(API_URL,{
+await fetch(API,{
 
 method:"POST",
 
@@ -183,39 +134,112 @@ body:datos
 
 
 
-const resultado = await respuesta.json();
-
-
-
-console.log(resultado);
-
-
-
-document.getElementById("mensaje").innerHTML =
-"✅ Archivo guardado correctamente";
-
-
-
-document.getElementById("formulario").reset();
-
-
-
-}catch(error){
-
-
-console.log(error);
-
-
-document.getElementById("mensaje").innerHTML =
-"❌ Error al guardar";
+mostrar();
 
 
 }
 
 
 
+
+
+
+
+async function mostrar(){
+
+
+const res =
+await fetch(API);
+
+
+const datos =
+await res.json();
+
+
+
+tabla.innerHTML="";
+
+
+
+datos.forEach(m=>{
+
+
+tabla.innerHTML+=`
+
+
+<tr class="border">
+
+
+<td>
+
+${m.titulo}
+
+</td>
+
+
+<td>
+
+${m.descripcion}
+
+</td>
+
+
+
+<td>
+
+
+<button
+
+onclick="eliminar('${m._id}')"
+
+class="bg-red-500 text-white p-2">
+
+Eliminar
+
+</button>
+
+
+</td>
+
+
+
+</tr>
+
+
+`;
+
+
 });
 
+
+
+}
+
+
+
+
+
+
+
+
+async function eliminar(id){
+
+
+await fetch(`${API}/${id}`,{
+
+method:"DELETE"
+
+});
+
+
+mostrar();
+
+
+}
+
+
+
+mostrar();
 
 
 </script>
