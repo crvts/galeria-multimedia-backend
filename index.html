@@ -68,13 +68,17 @@ class="mb-3">
 
 
 
+
+
 <button 
 onclick="guardar()"
+id="botonGuardar"
 class="bg-pink-600 text-white p-3 rounded w-full">
 
 Guardar elemento 💾
 
 </button>
+
 
 
 
@@ -98,7 +102,9 @@ Elementos guardados
 
 
 
+
 <script>
+
 
 
 const API_URL =
@@ -106,13 +112,15 @@ const API_URL =
 
 
 
-let editando=null;
+let editando = null;
+
 
 
 
 
 
 async function guardar(){
+
 
 
 const datos = new FormData();
@@ -133,17 +141,31 @@ document.getElementById("descripcion").value
 
 
 
-datos.append(
-"imagen",
-document.getElementById("imagen").files[0]
-);
+
+// Solo manda archivo si seleccionaste uno
+
+const imagen =
+document.getElementById("imagen").files[0];
+
+
+if(imagen){
+
+datos.append("imagen",imagen);
+
+}
 
 
 
-datos.append(
-"audio",
-document.getElementById("audio").files[0]
-);
+
+const audio =
+document.getElementById("audio").files[0];
+
+
+if(audio){
+
+datos.append("audio",audio);
+
+}
 
 
 
@@ -151,17 +173,16 @@ document.getElementById("audio").files[0]
 
 let url = API_URL;
 
-
-let metodo="POST";
+let metodo = "POST";
 
 
 
 if(editando){
 
 
-url=`${API_URL}/${editando}`;
+url = `${API_URL}/${editando}`;
 
-metodo="PUT";
+metodo = "PUT";
 
 
 }
@@ -170,7 +191,7 @@ metodo="PUT";
 
 
 
-await fetch(url,{
+const respuesta = await fetch(url,{
 
 method:metodo,
 
@@ -180,17 +201,40 @@ body:datos
 
 
 
-alert("Guardado correctamente");
+if(respuesta.ok){
+
+
+alert(
+editando 
+?
+"✅ Elemento actualizado"
+:
+"✅ Elemento guardado"
+);
+
+
+}else{
+
+
+alert("❌ Error al guardar");
+
+}
+
 
 
 
 editando=null;
 
 
+document.getElementById("botonGuardar").innerHTML =
+"Guardar elemento 💾";
+
+
 limpiar();
 
 
 mostrar();
+
 
 
 }
@@ -201,7 +245,10 @@ mostrar();
 
 
 
+
+
 async function mostrar(){
+
 
 
 const respuesta =
@@ -214,11 +261,14 @@ await respuesta.json();
 
 
 
+
 lista.innerHTML="";
 
 
 
+
 datos.forEach(e=>{
+
 
 
 lista.innerHTML += `
@@ -228,43 +278,76 @@ lista.innerHTML += `
 
 
 <h3 class="font-bold text-xl">
+
 ${e.titulo}
+
 </h3>
 
 
+
 <p>
+
 ${e.descripcion}
+
 </p>
 
 
-<img 
-src="${e.imagenUrl}"
-width="200">
 
 
 
+${e.imagenUrl ?
+
+`
+<img src="${e.imagenUrl}" width="200">
+`
+
+:
+""
+}
+
+
+
+
+
+${e.audioUrl ?
+
+`
 <audio controls>
 
 <source src="${e.audioUrl}">
 
 </audio>
+`
+
+:
+""
+}
 
 
 
-<br>
+
+<br><br>
+
+
+
 
 
 <button
 
-onclick="editar('${e._id}',
+onclick="editar(
+'${e._id}',
 '${e.titulo}',
-'${e.descripcion}')"
+'${e.descripcion}'
+)"
 
 class="bg-yellow-400 px-3 py-1 rounded">
 
 Editar
 
 </button>
+
+
+
 
 
 
@@ -279,16 +362,21 @@ Eliminar
 </button>
 
 
+
 </div>
 
 
 `;
 
 
+
 });
 
 
+
 }
+
+
 
 
 
@@ -299,16 +387,42 @@ Eliminar
 function editar(id,titulo,descripcion){
 
 
-document.getElementById("titulo").value=titulo;
+
+document.getElementById("titulo").value =
+titulo;
 
 
-document.getElementById("descripcion").value=descripcion;
+
+document.getElementById("descripcion").value =
+descripcion;
+
 
 
 editando=id;
 
 
+
+
+document.getElementById("botonGuardar").innerHTML =
+"Actualizar elemento ✏️";
+
+
+
+
+
+window.scrollTo({
+
+top:0,
+
+behavior:"smooth"
+
+});
+
+
+
 }
+
+
 
 
 
@@ -319,19 +433,45 @@ editando=id;
 async function eliminar(id){
 
 
+
+const respuesta =
 await fetch(
+
 `${API_URL}/${id}`,
+
 {
 
 method:"DELETE"
 
-});
+}
+
+);
+
+
+
+
+if(respuesta.ok){
+
+
+alert("🗑️ Eliminado correctamente");
+
+
+}else{
+
+
+alert("Error al eliminar");
+
+
+}
+
 
 
 mostrar();
 
 
+
 }
+
 
 
 
@@ -342,13 +482,16 @@ mostrar();
 function limpiar(){
 
 
-titulo.value="";
+document.getElementById("titulo").value="";
 
-descripcion.value="";
 
-imagen.value="";
+document.getElementById("descripcion").value="";
 
-audio.value="";
+
+document.getElementById("imagen").value="";
+
+
+document.getElementById("audio").value="";
 
 
 }
@@ -356,7 +499,10 @@ audio.value="";
 
 
 
+
 mostrar();
+
+
 
 
 
