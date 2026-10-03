@@ -2,513 +2,637 @@
 <html lang="es">
 
 <head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-<meta charset="UTF-8">
-<title>Galería Multimedia CRUD</title>
+    <title>MiGalería | Música</title>
 
-<script src="https://cdn.tailwindcss.com"></script>
-
+    <link rel="stylesheet" href="style.css">
 </head>
 
+<body>
 
-<body class="bg-pink-100 p-8">
+    <!-- FONDO DINÁMICO -->
+    <div class="dynamic-background"></div>
+    <div class="background-overlay"></div>
 
 
-<div class="max-w-4xl mx-auto bg-white p-8 rounded-3xl shadow">
+    <!-- =========================
+         SIDEBAR
+    ========================== -->
 
+    <aside class="sidebar">
 
-<h1 class="text-4xl font-bold text-pink-600 text-center mb-6">
-🎨 Galería Multimedia CRUD
-</h1>
+        <div class="logo">
+            🎵 <span>MiGalería</span>
+        </div>
 
 
+        <nav>
 
-<input 
-id="titulo"
-class="w-full border p-3 rounded mb-3"
-placeholder="Título">
+            <button onclick="irInicio()">
+                🏠 Inicio
+            </button>
 
+            <button onclick="irCanciones()">
+                🎵 Canciones
+            </button>
 
+            <button onclick="irPlaylists()">
+                📚 Playlists
+            </button>
 
-<textarea
-id="descripcion"
-class="w-full border p-3 rounded mb-3"
-placeholder="Descripción">
-</textarea>
+            <button onclick="irSubir()">
+                ➕ Subir canción
+            </button>
 
+        </nav>
 
 
+        <div class="sidebar-bottom">
 
-<label>
-Imagen:
-</label>
+            <p>Mi Galería Multimedia</p>
 
-<input 
-type="file"
-id="imagen"
-accept="image/*"
-class="mb-3">
+            <small>
+                MongoDB + Cloudinary
+            </small>
 
+        </div>
 
+    </aside>
 
-<br>
 
 
+    <!-- =========================
+         CONTENIDO PRINCIPAL
+    ========================== -->
 
-<label>
-Audio:
-</label>
+    <main class="main-content">
 
 
-<input 
-type="file"
-id="audio"
-accept="audio/*"
-class="mb-3">
+        <!-- TOPBAR -->
 
+        <header class="topbar">
 
+            <div class="mobile-logo">
+                🎵 MiGalería
+            </div>
 
 
+            <div class="search-box">
 
-<button 
-onclick="guardar()"
-id="botonGuardar"
-class="bg-pink-600 text-white p-3 rounded w-full">
+                🔎
 
-Guardar elemento 💾
+                <input
+                    type="text"
+                    id="buscador"
+                    placeholder="¿Qué quieres escuchar?"
+                    oninput="buscarCanciones()"
+                >
 
-</button>
+            </div>
 
 
+            <div class="user">
 
+                <div class="user-avatar">
+                    P
+                </div>
 
+                <span>
+                    Pinkote
+                </span>
 
-<hr class="my-8">
+            </div>
 
+        </header>
 
 
-<h2 class="text-2xl font-bold">
-Elementos guardados
-</h2>
 
+        <!-- =========================
+             INICIO
+        ========================== -->
 
-<div id="lista"></div>
+        <section
+            id="inicio"
+            class="hero-section">
 
+            <div>
 
+                <p class="green-text">
+                    TU BIBLIOTECA MUSICAL
+                </p>
 
-</div>
+                <h1>
+                    Buenas, Pinkote 👋
+                </h1>
 
+                <p class="hero-description">
+                    Escucha, organiza y administra
+                    tus canciones favoritas.
+                </p>
 
+                <button
+                    class="primary-button"
+                    onclick="irSubir()">
 
+                    ＋ Agregar canción
 
+                </button>
 
+            </div>
 
-<script>
+        </section>
 
 
 
-const API_URL =
-"https://galeria-multimedia-1.onrender.com/multimedia";
+        <!-- =========================
+             CANCIONES
+        ========================== -->
 
+        <section
+            id="canciones"
+            class="music-section">
 
+            <div class="section-header">
 
-let editando = null;
+                <div>
 
+                    <p class="green-text">
+                        TU COLECCIÓN
+                    </p>
 
+                    <h2>
+                        Canciones
+                    </h2>
 
+                </div>
 
 
+                <div class="carousel-buttons">
 
-async function guardar(){
+                    <button onclick="moverCarrusel(-1)">
+                        ‹
+                    </button>
 
+                    <button onclick="moverCarrusel(1)">
+                        ›
+                    </button>
 
+                </div>
 
-const datos = new FormData();
+            </div>
 
 
+            <div
+                id="lista"
+                class="music-carousel">
 
-datos.append(
-"titulo",
-document.getElementById("titulo").value
-);
+            </div>
 
+        </section>
 
 
-datos.append(
-"descripcion",
-document.getElementById("descripcion").value
-);
 
+        <!-- =========================
+             PLAYLISTS
+        ========================== -->
 
+        <section
+            id="playlists"
+            class="playlist-section">
 
+            <div class="section-header">
 
-// Solo manda archivo si seleccionaste uno
+                <div>
 
-const imagen =
-document.getElementById("imagen").files[0];
+                    <p class="green-text">
+                        TU MÚSICA
+                    </p>
 
+                    <h2>
+                        Mis Playlists
+                    </h2>
 
-if(imagen){
+                </div>
 
-datos.append("imagen",imagen);
 
-}
+                <button
+                    class="secondary-button"
+                    onclick="crearPlaylist()">
 
+                    ＋ Crear playlist
 
+                </button>
 
+            </div>
 
-const audio =
-document.getElementById("audio").files[0];
 
+            <div
+                id="listaPlaylists"
+                class="playlist-grid">
 
-if(audio){
+            </div>
 
-datos.append("audio",audio);
+        </section>
 
-}
 
 
+        <!-- =========================
+             VISTA DE PLAYLIST
+        ========================== -->
 
+        <section
+            id="playlistView"
+            class="playlist-view hidden">
 
+            <button
+                class="back-playlist"
+                onclick="cerrarPlaylist()">
 
-let url = API_URL;
+                ← Volver a playlists
 
-let metodo = "POST";
+            </button>
 
 
+            <div class="playlist-header">
 
-if(editando){
+                <div
+                    id="playlistCover"
+                    class="playlist-big-cover">
 
+                    🎵
 
-url = `${API_URL}/${editando}`;
+                </div>
 
-metodo = "PUT";
 
+                <div class="playlist-info">
 
-}
+                    <p class="green-text">
+                        PLAYLIST
+                    </p>
 
+                    <h1 id="playlistTitle">
+                        Mi playlist
+                    </h1>
 
+                    <p id="playlistCount">
+                        0 canciones
+                    </p>
 
+                    <button
+                        class="primary-button"
+                        onclick="reproducirPlaylistActual()">
 
+                        ▶ Reproducir
 
-const respuesta = await fetch(url,{
+                    </button>
 
-method:metodo,
+                    <button
+                        class="shuffle-button"
+                        onclick="reproducirPlaylistAleatoria()">
 
-body:datos
+                        🔀 Aleatorio
 
-});
+                    </button>
 
+                </div>
 
+            </div>
 
-if(respuesta.ok){
 
+            <div
+                id="playlistSongs"
+                class="playlist-songs">
 
-alert(
-editando 
-?
-"✅ Elemento actualizado"
-:
-"✅ Elemento guardado"
-);
+            </div>
 
+        </section>
 
-}else{
 
 
-alert("❌ Error al guardar");
+        <!-- =========================
+             SUBIR CANCIÓN
+        ========================== -->
 
-}
+        <section
+            id="subir"
+            class="upload-section">
 
+            <div class="upload-card">
 
+                <div class="upload-title">
 
+                    <p class="green-text">
+                        NUEVA CANCIÓN
+                    </p>
 
-editando=null;
+                    <h2>
+                        Agregar multimedia
+                    </h2>
 
+                    <p>
+                        Sube una portada y un archivo de audio
+                        para agregarlo a tu biblioteca.
+                    </p>
 
-document.getElementById("botonGuardar").innerHTML =
-"Guardar elemento 💾";
+                </div>
 
 
-limpiar();
+                <label>
+                    Título
+                </label>
 
+                <input
+                    id="titulo"
+                    type="text"
+                    placeholder="Ej. El Fin del Mundo"
+                >
 
-mostrar();
 
+                <label>
+                    Descripción
+                </label>
 
+                <textarea
+                    id="descripcion"
+                    placeholder="Describe tu canción..."
+                ></textarea>
 
-}
 
+                <div class="file-grid">
 
+                    <div>
 
+                        <label>
+                            🖼️ Portada
+                        </label>
 
+                        <input
+                            type="file"
+                            id="imagen"
+                            accept="image/*"
+                        >
 
+                    </div>
 
 
+                    <div>
 
+                        <label>
+                            🎵 Audio
+                        </label>
 
-async function mostrar(){
+                        <input
+                            type="file"
+                            id="audio"
+                            accept=".mp3,.wav,.m4a,audio/*"
+                        >
 
+                    </div>
 
+                </div>
 
-const respuesta =
-await fetch(API_URL);
 
+                <button
+                    id="botonGuardar"
+                    class="primary-button full"
+                    onclick="guardar()">
 
+                    💾 Guardar canción
 
-const datos =
-await respuesta.json();
+                </button>
 
 
+                <button
+                    class="cancel-button"
+                    onclick="limpiar()">
 
+                    Limpiar
 
-lista.innerHTML="";
+                </button>
 
 
+                <div
+                    id="mensaje"
+                    class="message">
 
+                </div>
 
-datos.forEach(e=>{
+            </div>
 
+        </section>
 
+    </main>
 
-lista.innerHTML += `
 
 
-<div class="border p-4 mt-4 rounded">
+    <!-- =========================
+         REPRODUCTOR
+    ========================== -->
 
+    <footer class="player">
 
-<h3 class="font-bold text-xl">
 
-${e.titulo}
+        <!-- CANCIÓN ACTUAL -->
 
-</h3>
+        <div class="player-song">
 
+            <div
+                id="portadaReproductor"
+                class="player-cover">
 
+                🎵
 
-<p>
+            </div>
 
-${e.descripcion}
 
-</p>
+            <div class="player-song-info">
 
+                <strong id="tituloReproductor">
+                    Nada reproduciéndose
+                </strong>
 
+                <small id="artistaReproductor">
+                    MiGalería
+                </small>
 
+            </div>
 
+        </div>
 
-${e.imagenUrl ?
 
-`
-<img src="${e.imagenUrl}" width="200">
-`
 
-:
-""
-}
+        <!-- CONTROLES -->
 
+        <div class="player-center">
 
 
+            <div class="player-buttons">
 
+                <button
+                    onclick="cancionAnterior()"
+                    title="Anterior">
 
-${e.audioUrl ?
+                    ⏮
 
-`
-<audio controls>
+                </button>
 
-<source src="${e.audioUrl}">
 
-</audio>
-`
+                <button
+                    id="shuffleButton"
+                    onclick="activarAleatorio()"
+                    title="Aleatorio">
 
-:
-""
-}
+                    🔀
 
+                </button>
 
 
+                <button
+                    id="mainPlay"
+                    class="play-big"
+                    onclick="togglePlay()"
+                    title="Reproducir">
 
-<br><br>
+                    ▶
 
+                </button>
 
 
+                <button
+                    onclick="cancionSiguiente()"
+                    title="Siguiente">
 
+                    ⏭
 
-<button
+                </button>
 
-onclick="editar(
-'${e._id}',
-'${e.titulo}',
-'${e.descripcion}'
-)"
 
-class="bg-yellow-400 px-3 py-1 rounded">
+                <button
+                    id="repeatButton"
+                    onclick="activarRepetir()"
+                    title="Repetir">
 
-Editar
+                    🔁
 
-</button>
+                </button>
 
+            </div>
 
 
+            <!-- AUDIO REAL -->
 
+            <div class="audio-container">
 
+                <span id="currentTime">
+                    0:00
+                </span>
 
-<button
 
-onclick="eliminar('${e._id}')"
+                <input
+                    type="range"
+                    id="progressBar"
+                    min="0"
+                    max="100"
+                    value="0"
+                    step="0.1"
+                    oninput="cambiarTiempo()"
+                >
 
-class="bg-red-500 text-white px-3 py-1 rounded">
 
-Eliminar
+                <span id="duration">
+                    0:00
+                </span>
 
-</button>
+            </div>
 
 
+            <!-- AUDIO OCULTO -->
 
-</div>
+            <audio
+                id="audioPlayer"
+                preload="metadata">
 
+            </audio>
 
-`;
+        </div>
 
 
 
-});
+        <!-- VOLUMEN -->
 
+        <div class="player-right">
 
+            <span>
+                🔊
+            </span>
 
-}
+            <input
+                type="range"
+                id="volumeControl"
+                min="0"
+                max="1"
+                step="0.01"
+                value="1"
+                oninput="cambiarVolumen()"
+            >
 
+        </div>
 
+    </footer>
 
 
 
+    <!-- =========================
+         MODAL PLAYLIST
+    ========================== -->
 
+    <div
+        id="playlistModal"
+        class="modal hidden">
 
+        <div class="modal-content">
 
+            <button
+                class="close-modal"
+                onclick="cerrarModal()">
 
-function editar(id,titulo,descripcion){
+                ×
 
+            </button>
 
 
-document.getElementById("titulo").value =
-titulo;
+            <h2>
+                Crear playlist
+            </h2>
 
+            <p>
+                Dale un nombre a tu nueva playlist.
+            </p>
 
 
-document.getElementById("descripcion").value =
-descripcion;
+            <input
+                id="nombrePlaylist"
+                placeholder="Ej. Mis favoritas"
+            >
 
 
+            <button
+                class="primary-button full"
+                onclick="guardarPlaylist()">
 
-editando=id;
+                Crear playlist
 
+            </button>
 
+        </div>
 
+    </div>
 
-document.getElementById("botonGuardar").innerHTML =
-"Actualizar elemento ✏️";
 
 
-
-
-
-window.scrollTo({
-
-top:0,
-
-behavior:"smooth"
-
-});
-
-
-
-}
-
-
-
-
-
-
-
-
-
-async function eliminar(id){
-
-
-
-const respuesta =
-await fetch(
-
-`${API_URL}/${id}`,
-
-{
-
-method:"DELETE"
-
-}
-
-);
-
-
-
-
-if(respuesta.ok){
-
-
-alert("🗑️ Eliminado correctamente");
-
-
-}else{
-
-
-alert("Error al eliminar");
-
-
-}
-
-
-
-mostrar();
-
-
-
-}
-
-
-
-
-
-
-
-
-function limpiar(){
-
-
-document.getElementById("titulo").value="";
-
-
-document.getElementById("descripcion").value="";
-
-
-document.getElementById("imagen").value="";
-
-
-document.getElementById("audio").value="";
-
-
-}
-
-
-
-
-
-mostrar();
-
-
-
-
-
-</script>
-
-
+    <script src="script.js"></script>
 
 </body>
 
